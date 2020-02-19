@@ -1,7 +1,7 @@
 // PROGRAM
 // If there is storage data indicating that weather data has already been input from previous session, use that Object to call api
 
-if ( storageEmpty() ){
+if ( !storageEmpty() ){
 
     // Update UI to prompt new location data
     newLocationDisplay();
@@ -19,34 +19,61 @@ if ( storageEmpty() ){
         const countryCode = await countryCodesApi(inCountry);
 
         // Query API for weather relative to location
-        const weather = await weatherApi(inCity, countryCode); 
-        const truncTemp = Math.trunc(weather.main.temp);
+        const weather = await weatherApi(inCity, countryCode);
+
+        // This weather response object needs to have its date converted to get the real day of the week
+        console.log(weather);
 
         // Make Location object 
         const location = {
             city: inCity,
             country: countryCode,
-            weather: weather,
-            temperature: truncTemp
+            forecast: []
         }
+
+        // Run function that extracts both the date and temperature from "12pm" indexes of each day
+
+        const list = weather.list 
+        let i = 2; 
+        while (i < list.length) {
+
+            // Convert each of these dates to a real day
+            let dayOfWeekNum = unixTimestamp(list[i].dt);
+            let weekNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            
+            // Extract temperature and day
+            location.forecast.push( {
+                overallWeather: list[i].weather[0].main,
+                day: weekNames[dayOfWeekNum],
+                temperature: Math.trunc(list[i].main.temp)
+            });
+
+            // Increment index by 8 => days broken into three hour time blocks = 24/3 = 8 ; 12pm selected fro each of the five days
+            i += 8;
+        }
+
+        // Log location
+        console.log(location);
 
         // Store in sessionStorage
         sessionStorage.setItem("City", location.city);
         sessionStorage.setItem("Country", location.country);
-        sessionStorage.setItem("Temperature", location.temperature);
-        console.log(sessionStorage);
+        sessionStorage.setItem("Forecast", JSON.stringify(location.forecast));
 
         // On response, present new page with relevant information
-
+        locationDisplay(location);
     });
 } 
-else {
-    
+/*else {
     
     // Update UI with previous stored API data relative to the location stored in sessionStorage
-}   
 
+} */  
+
+// UI
 function newLocationDisplay() {
+
+    const container = document.getElementById("container"); 
 
     // Dynamic change of container Display
     container.style.display = "flex";
@@ -55,46 +82,55 @@ function newLocationDisplay() {
 
     // Plant HTML
     container.innerHTML = `
-        <form class="newLocation">
+        <form id="newLocation">
             <input type="text" id="cityInput" name="city">
             <input type="text" id="countryInput" name="country">
             <input type="submit" id="submit">
         </form>
     `;
 }
+function locationDisplay(location) {
 
+    // Clear container
+    document.getElementById("container").innerHTML = "";
+
+    // Depending status of 'overallWeather" use a particular icon from Font Awesome
+    getWeatherStatus(location);
+
+    // Install UI for main icons and small icons for each day
+    container.innerHTML = `
+        <div id="location">
+            <div id="mainIcon"> Test </div>
+            <div id="dayIcons"> Small Icons</div>
+        </div>
+    `;
+
+    // Edite Location element display
+    const locationElement = document.getElementById("location");
+
+    locationElement.style.display = "grid";
+    locationElement.style.gridTemplateRows = "2fr 1fr";
+
+    function getWeatherStatus(location) {
+
+        const weatherPossibilities = ["Rain", "Clouds", "Clear", "Storm"];
+        console.log(location);
+
+        location.forecast.forEach( (day) => {
+            switch (day.overallWeather) {
+                case "Clouds" : console.log("Test");
+            }
+        });  
+    }
+}
+
+// STORAGE
 function storageEmpty() {
     if (sessionStorage.length === 0) return true;
     else return false;
 }
 
-function locale() {
-
-    function customLocation() {
-
-        // Update view to show UI allowing input for custom location
-        //const newLocation = "Test";
-    }
-
-    function existingLocation() {
-
-    }
-}
-
-function icons() {
-    // Store Font Awesome links to various weather icons based on recieved temperature from API in array
-}
-
-async function weatherApi(inCity, inCountry) {
-
-    const apiKey = "a3b951b941cf45ce8cb28d899d8da886";
-
-    const rawRepsonse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${inCity},${inCountry}&units=metric&appid=${apiKey}`);
-    const response = await rawRepsonse.json();
-    const locationWeather = response;
-
-    return locationWeather;
-}   
+// API
 async function countryCodesApi(inCountry) {
 
     const rawRepsonse = await fetch(`https://pkgstore.datahub.io/core/country-list/data_json/data/8c458f2d15d9f2119654b29ede6e45b8/data_json.json`);
@@ -107,4 +143,22 @@ async function countryCodesApi(inCountry) {
     })
 
     return countryCode;
+}
+async function weatherApi(inCity, inCountry) {
+
+    const apiKey = "a3b951b941cf45ce8cb28d899d8da886";
+
+    const rawRepsonse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${inCity},${inCountry}&units=metric&appid=${apiKey}`);
+    const response = await rawRepsonse.json();
+    const locationWeather = response;
+
+    return locationWeather;
+} 
+
+// HELPERS
+function unixTimestamp(utc)
+{
+    let dt = new Date(utc*1000);
+    let day = dt.getDay();
+    return +day ;  
 }
