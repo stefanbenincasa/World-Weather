@@ -1,4 +1,5 @@
 // PROGRAM
+
 // If there is storage data indicating that weather data has already been input from previous session, use that Object to call api
 
 if ( !storageEmpty() ){
@@ -20,9 +21,6 @@ if ( !storageEmpty() ){
 
         // Query API for weather relative to location
         const weather = await weatherApi(inCity, countryCode);
-
-        // This weather response object needs to have its date converted to get the real day of the week
-        console.log(weather);
 
         // Make Location object 
         const location = {
@@ -94,34 +92,68 @@ function locationDisplay(location) {
     // Clear container
     document.getElementById("container").innerHTML = "";
 
-    // Depending status of 'overallWeather" use a particular icon from Font Awesome
-    getWeatherStatus(location);
-
     // Install UI for main icons and small icons for each day
     container.innerHTML = `
         <div id="location">
-            <div id="mainIcon"> Test </div>
-            <div id="dayIcons"> Small Icons</div>
+            <div id="mainIcon"> Test</div>
+            <div id="dayIcons>  Test</div>
         </div>
     `;
 
-    // Edite Location element display
+    // Edit Location element display
     const locationElement = document.getElementById("location");
-
     locationElement.style.display = "grid";
     locationElement.style.gridTemplateRows = "2fr 1fr";
 
-    function getWeatherStatus(location) {
+    // Depending status of 'overallWeather" use a particular icon from Font Awesome
+    setIcon(location);
 
-        const weatherPossibilities = ["Rain", "Clouds", "Clear", "Storm"];
-        console.log(location);
+    // Update UI using Location and new Icon property
+    // Set mainIcon first
+    locationElement.firstElementChild.innerHTML = location.forecast[0].icon;
+    //locationElement.firstElementChild.innerHTML = "Test";
+    // Set other icons
+
+
+    function setIcon(location) {
 
         location.forecast.forEach( (day) => {
-            switch (day.overallWeather) {
-                case "Clouds" : console.log("Test");
+            if (day.overallWeather.toUpperCase().includes("RAIN")) {
+                day.icon = getIconTag("rain");
             }
-        });  
+            else if (day.overallWeather.toUpperCase().includes("STORM")) {
+                day.icon = getIconTag("storm");
+            }
+            else if (day.overallWeather.toUpperCase().includes("CLEAR")) {
+                day.icon = getIconTag("clear");
+            }
+            else if (day.overallWeather.toUpperCase().includes("CLOUDS")) {
+                day.icon = getIconTag("clouds");
+            }
+            else if (day.overallWeather.toUpperCase().includes("SNOW")) {
+                day.icon = getIconTag("snow");
+            }
+        });
+
+        function getIconTag(weatherStatus) {
+    
+            switch (weatherStatus) {
+                case "rain" :   
+                    return `<i class="fas fa-cloud-showers-heavy"></i>`;
+                case "storm" :  
+                    return `<i class="fas fa-bolt"></i>`;
+                case "clear" :  
+                    return `<i class="fas fa-sun"></i>`;
+                case "clouds" : 
+                    return `<i class="fas fa-cloud"></i>`;
+                case "snow" :
+                    return `<i class="fas fa-snowflake"></i>`;
+    
+                default :  return `<i class="fas fa-cloud"></i>`; 
+            }
+        }
     }
+
 }
 
 // STORAGE

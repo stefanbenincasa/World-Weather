@@ -53,11 +53,12 @@ input[type=submit] {
     }
         #mainIcon {
             padding: 1rem;
-            background-color: red;
         }
         #dayIcons {
             padding: 1rem;
-            background-color: orange;
+
+            display: flex;
+            justify-content: space-between;
         }
 
 .icon {
