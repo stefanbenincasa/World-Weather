@@ -18,6 +18,7 @@ body {
     align-items: center;
     justify-content: center;
 
+    font-family: 'Lacquer', sans-serif;
     background-color: var(--secondary-color);
 }
 
@@ -29,7 +30,7 @@ input[type=submit] {
     height: 75%;
     width: 75%;
     margin: auto;
-    padding: 1rem;
+    padding: .5rem;
 
     font-size: 2rem;
     color: white;
@@ -55,6 +56,7 @@ input[type=submit] {
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 1rem;
         }
         #location i {
             width: 100%;
@@ -64,6 +66,8 @@ input[type=submit] {
         #mainIcon {
             padding: 1rem;
             font-size: 4rem;
+            flex-direction: column;
+            border: 2px solid var(--secondary-color);
         }
             #mainIcon i::before {
                 font-size: 8rem;
@@ -74,7 +78,7 @@ input[type=submit] {
             border: 1px solid var(--secondary-color);
         }
             #dayIcons > div {
-                width: 25%;
+                height: 100%;
                 flex-direction: column;
             }
             #dayIcons i::before {

@@ -110,12 +110,15 @@ function locationDisplay(location) {
     // Prime display with style edits
     locationElement.style.display = "grid";
     locationElement.style.gridTemplateRows = "2fr 1fr";
+    locationElement.style.gridGap = ".5rem";
 
     // Depending status of 'overallWeather", use a particular icon from Font Awesome
     setIcon(location);
 
     // Set mainIcon first
-    mainIconElement.innerHTML = location.forecast[0].icon;
+    mainIconElement.innerHTML = 
+    "Today" + location.forecast[0].icon +
+    location.forecast[0].temperature + "°C";
     // Set other icons
     location.forecast.forEach( (object, index) => {
 
@@ -123,7 +126,9 @@ function locationDisplay(location) {
 
         dayIconsElement.innerHTML += `
             <div class="icon">
+                ${object.day}
                 ${object.icon}
+                ${object.temperature}°C
             </div>
         `
     })
