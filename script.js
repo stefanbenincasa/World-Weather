@@ -2,7 +2,7 @@
 
 // If there is storage data indicating that weather data has already been input from previous session, use that Object to call api
 
-if ( !storageEmpty() ){
+if ( storageEmpty() ){
 
     // Update UI to prompt new location data
     newLocationDisplay();
@@ -21,11 +21,12 @@ if ( !storageEmpty() ){
 
         // Query API for weather relative to location
         const weather = await weatherApi(inCity, countryCode);
+        console.log(weather);
 
         // Make Location object 
         const location = {
             city: inCity,
-            country: countryCode,
+            country: inCountry,
             forecast: []
         }
 
@@ -62,12 +63,26 @@ if ( !storageEmpty() ){
         locationDisplay(location);
     });
 } 
-
-/*else {
+else {
     
     // Update UI with previous stored API data relative to the location stored in sessionStorage
-
-} */  
+    
+    // Parse json from storage => sessionStorage has something in it
+    const city = sessionStorage.getItem("City");
+    const country = sessionStorage.getItem("Country");    
+    const forecastString = sessionStorage.getItem("Forecast");
+    const parsedForecast = JSON.parse(forecastString);
+    
+    const location = {
+        city: city,
+        country: country,
+        forecast: parsedForecast
+    }
+    console.log(location);
+    
+    // Update locationDisplay UI 
+    locationDisplay(location);
+}   
 
 // UI
 function newLocationDisplay() {
@@ -82,7 +97,9 @@ function newLocationDisplay() {
     // Plant HTML
     container.innerHTML = `
         <form id="newLocation">
+            <label for="city">Insert name of city</label>
             <input type="text" id="cityInput" name="city">
+            <label for="country">Insert name of country</label>
             <input type="text" id="countryInput" name="country">
             <input type="submit" id="submit">
         </form>
@@ -95,7 +112,8 @@ function locationDisplay(location) {
 
     // Install UI for main icons and small icons for each day
     container.innerHTML = `
-        <div id="location">
+        <div id="location"> 
+            <h1>${location.city}</h1>
             <div id="mainIcon" class="icon"></div>
             <div id="dayIcons"></div>
         </div>
@@ -109,7 +127,7 @@ function locationDisplay(location) {
 
     // Prime display with style edits
     locationElement.style.display = "grid";
-    locationElement.style.gridTemplateRows = "2fr 1fr";
+    locationElement.style.gridTemplateRows = "1fr 2fr 1fr";
     locationElement.style.gridGap = ".5rem";
 
     // Depending status of 'overallWeather", use a particular icon from Font Awesome
