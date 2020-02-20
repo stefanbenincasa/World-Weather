@@ -16,57 +16,61 @@ if ( storageEmpty() ){
         // Prevent default form submission
         e.preventDefault();
         // Add form validation here
-        
+        if ( !formValidation() ) {
+            return;
+        } 
+        else {
 
-        // Grab data from input fields
-        const inCity = document.getElementById("cityInput").value;
-        const inCountry = document.getElementById("countryInput").value;
-
-        // Match input country with country code API
-        const countryCode = await countryCodesApi(inCountry);
-
-        // Query API for weather relative to location
-        const weather = await weatherApi(inCity, countryCode);
-        console.log(weather);
-
-        // Make Location object 
-        const location = {
-            city: inCity,
-            country: inCountry,
-            forecast: []
+            // Grab data from input fields
+            const inCity = document.getElementById("cityInput").value;
+            const inCountry = document.getElementById("countryInput").value;
+    
+            // Match input country with country code API
+            const countryCode = await countryCodesApi(inCountry);
+    
+            // Query API for weather relative to location
+            const weather = await weatherApi(inCity, countryCode);
+            console.log(weather);
+    
+            // Make Location object 
+            const location = {
+                city: inCity,
+                country: inCountry,
+                forecast: []
+            }
+    
+            // Run function that extracts both the date and temperature from "12pm" indexes of each day
+    
+            const list = weather.list 
+            let i = 2; 
+            while (i < list.length) {
+    
+                // Convert each of these dates to a real day
+                let dayOfWeekNum = unixTimestamp(list[i].dt);
+                let weekNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                
+                // Extract temperature and day
+                location.forecast.push( {
+                    overallWeather: list[i].weather[0].main,
+                    day: weekNames[dayOfWeekNum],
+                    temperature: Math.trunc(list[i].main.temp)
+                });
+    
+                // Increment index by 8 => days broken into three hour time blocks = 24/3 = 8 ; 12pm selected fro each of the five days
+                i += 8;
+            }
+    
+            // Log location
+            console.log(location);
+    
+            // Store in sessionStorage
+            sessionStorage.setItem("City", location.city);
+            sessionStorage.setItem("Country", location.country);
+            sessionStorage.setItem("Forecast", JSON.stringify(location.forecast));
+    
+            // On response, present new page with relevant information
+            locationDisplay(location);
         }
-
-        // Run function that extracts both the date and temperature from "12pm" indexes of each day
-
-        const list = weather.list 
-        let i = 2; 
-        while (i < list.length) {
-
-            // Convert each of these dates to a real day
-            let dayOfWeekNum = unixTimestamp(list[i].dt);
-            let weekNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            
-            // Extract temperature and day
-            location.forecast.push( {
-                overallWeather: list[i].weather[0].main,
-                day: weekNames[dayOfWeekNum],
-                temperature: Math.trunc(list[i].main.temp)
-            });
-
-            // Increment index by 8 => days broken into three hour time blocks = 24/3 = 8 ; 12pm selected fro each of the five days
-            i += 8;
-        }
-
-        // Log location
-        console.log(location);
-
-        // Store in sessionStorage
-        sessionStorage.setItem("City", location.city);
-        sessionStorage.setItem("Country", location.country);
-        sessionStorage.setItem("Forecast", JSON.stringify(location.forecast));
-
-        // On response, present new page with relevant information
-        locationDisplay(location);
     });
 } 
 else {
@@ -104,9 +108,9 @@ function newLocationDisplay() {
     // Plant HTML
     container.innerHTML = `
         <form id="newLocation">
-            <label for="city">Insert name of city</label>
+            <label for="city">City</label>
             <input type="text" id="cityInput" name="city">
-            <label for="country">Insert name of country</label>
+            <label for="country">Country</label>
             <input type="text" id="countryInput" name="country">
             <input type="submit" id="submit">
         </form>
@@ -242,11 +246,21 @@ function unixTimestamp(utc)
 function formValidation() {
     
     // Regex
-    const regex = /^[a-zA-Z]{1-20}$/;
+    const regex = /^[a-zA-Z]{1,20}$/;
 
     // Grab data from input fields
     const inCity = document.getElementById("cityInput").value;
     const inCountry = document.getElementById("countryInput").value;
 
-    console.log("ests");
+    // Evaluate both inputs i.e. are they within character constraints
+    if ( (regex.test(inCity)) && (regex.test(inCountry)) ){
+        return true;
+    }
+    else {
+        invalidInput();
+        return false;
+    }
+}
+function invalidInput() {
+    document.getElementById("")
 }
