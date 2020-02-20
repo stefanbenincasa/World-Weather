@@ -62,6 +62,7 @@ if ( !storageEmpty() ){
         locationDisplay(location);
     });
 } 
+
 /*else {
     
     // Update UI with previous stored API data relative to the location stored in sessionStorage
@@ -95,24 +96,37 @@ function locationDisplay(location) {
     // Install UI for main icons and small icons for each day
     container.innerHTML = `
         <div id="location">
-            <div id="mainIcon"> Test</div>
-            <div id="dayIcons>  Test</div>
+            <div id="mainIcon" class="icon"></div>
+            <div id="dayIcons"></div>
         </div>
     `;
 
-    // Edit Location element display
+
+    // Get relevant elements
     const locationElement = document.getElementById("location");
+    const mainIconElement = document.getElementById("mainIcon");
+    const dayIconsElement = document.getElementById("dayIcons");
+
+    // Prime display with style edits
     locationElement.style.display = "grid";
     locationElement.style.gridTemplateRows = "2fr 1fr";
 
-    // Depending status of 'overallWeather" use a particular icon from Font Awesome
+    // Depending status of 'overallWeather", use a particular icon from Font Awesome
     setIcon(location);
 
-    // Update UI using Location and new Icon property
     // Set mainIcon first
-    locationElement.firstElementChild.innerHTML = location.forecast[0].icon;
-    //locationElement.firstElementChild.innerHTML = "Test";
+    mainIconElement.innerHTML = location.forecast[0].icon;
     // Set other icons
+    location.forecast.forEach( (object, index) => {
+
+        if (index == 0) return;
+
+        dayIconsElement.innerHTML += `
+            <div class="icon">
+                ${object.icon}
+            </div>
+        `
+    })
 
 
     function setIcon(location) {

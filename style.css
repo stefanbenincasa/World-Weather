@@ -51,17 +51,38 @@ input[type=submit] {
         width: 100%;
         height: 100%;
     }
+        #location * {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #location i {
+            width: 100%;
+            height: 75%;
+        }
+
         #mainIcon {
             padding: 1rem;
+            font-size: 4rem;
         }
+            #mainIcon i::before {
+                font-size: 8rem;
+            }
         #dayIcons {
             padding: 1rem;
-
-            display: flex;
             justify-content: space-between;
+            border: 1px solid var(--secondary-color);
         }
+            #dayIcons > div {
+                width: 25%;
+                flex-direction: column;
+            }
+            #dayIcons i::before {
+                font-size: 2rem;
+            }
+
 
 .icon {
-    padding: 1rem; 
-    border: 1px solid var(--primary-color);
+
+    /* Style card like look here */
 }
