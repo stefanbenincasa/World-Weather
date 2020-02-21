@@ -300,12 +300,12 @@ function invalidInput(inputValidity, cityElement, countryElement) {
         if (inputValidity[property] === false) {
             switch (property) {
                 case "city" :
-                    cityElement.value = "City between 1-20 letters";
+                    cityElement.value = "1-20 letters needed";
                     cityElement.style.fontSize = "1.5rem";
                     cityElement.classList = "error";
                     break;
                 case "country" :
-                    countryElement.value = "Country between 1-20 letters"; 
+                    countryElement.value = "1-20 letters needed"; 
                     countryElement.style.fontSize = "1.5rem";
                     countryElement.classList = "error";
                     break;
