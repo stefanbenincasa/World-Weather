@@ -26,8 +26,8 @@ function main() {
             else {
     
                 // Grab data from input fields
-                const inCity = document.getElementById("cityInput").value;
-                const inCountry = document.getElementById("countryInput").value;
+                const inCity = document.getElementById("cityInput").value.trim();
+                const inCountry = document.getElementById("countryInput").value.trim();
         
                 // Match input country with country code API
                 const countryCode = await countryCodesApi(inCountry);
@@ -278,10 +278,12 @@ function formValidation() {
     const inputValidity = {city: false, country: false}
 
     // Match input against character limit and update UI if so
-    if (regex.test(cityElement.value)) inputValidity.city = true;
-    if (regex.test(countryElement.value)) inputValidity.country = true; 
-    invalidInput(inputValidity, cityElement, countryElement); 
+    if (regex.test(cityElement.value.trim())) inputValidity.city = true;
+    if (regex.test(countryElement.value.trim())) inputValidity.country = true; 
+    invalidInput(inputValidity, cityElement, countryElement);
+
     console.log(inputValidity);
+    console.log(cityElement.value.trim());
 
     // Test if BOTH inputs are valid within character constraints, else do not query api
     if  ( (inputValidity.city === true) && (inputValidity.country === true)) {
