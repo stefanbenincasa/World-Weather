@@ -38,26 +38,8 @@ label {
 input {
     padding: 1rem;
     margin-bottom: 2rem;
-    border-radius: 1rem;
     text-align: center;
 }
-input[type=text] {
-    font-size: 2rem;
-    background-color: rgba(107,142,35,0.2);
-    border: none;
-    border-radius: 0;
-    border-bottom: dotted;
-}
-input[type=submit] {
-    background-color: gray;
-    border: none;
-}
-    input[type=submit]:hover {
-        background-color: var(--primary-color);
-        color: var(--secondary-color);
-        transition: 0.3s ease;
-    }
-
 
 #container { 
     height: 75%;
@@ -71,15 +53,27 @@ input[type=submit] {
     background-color: rgba(107,142,35,0.8);
 }
     #newLocation {
+        width: 75%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
-        #newLocation input {
-            margin-bottom: 1rem;
+        #cityInput, #countryInput {
+            width: 100%;
+            font-size: 1.5rem;
+            background-color: rgba(107,142,35,0.2);
+        }
+        #submit {
+            background-color: gray;
+            border: none;
             cursor: pointer;
         }
+            #submit:hover {
+                background-color: var(--primary-color);
+                color: var(--secondary-color);
+                transition: 0.3s ease;
+            }
     
     #location {
         width: 100%;
@@ -125,6 +119,15 @@ input[type=submit] {
 /* Utilities */ 
 .base {
     color: darkkhaki;
+}
+.error {
+    color: rgb(235, 31, 31);
+    border: none;
+    border-bottom: 5px dotted var(--primary-color);
+}
+.standard {
+    border: none;
+    border-bottom: 5px dotted var(--primary-color);
 }
 
 /* Media Queries */

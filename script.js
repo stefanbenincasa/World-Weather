@@ -109,9 +109,9 @@ function newLocationDisplay() {
     container.innerHTML = `
         <form id="newLocation">
             <label for="city">City</label>
-            <input type="text" id="cityInput" name="city">
+            <input type="text" id="cityInput" class="standard" name="city">
             <label for="country">Country</label>
-            <input type="text" id="countryInput" name="country">
+            <input type="text" id="countryInput" class="standard" name="country">
             <input type="submit" id="submit">
         </form>
     `;
@@ -249,18 +249,53 @@ function formValidation() {
     const regex = /^[a-zA-Z]{1,20}$/;
 
     // Grab data from input fields
-    const inCity = document.getElementById("cityInput").value;
-    const inCountry = document.getElementById("countryInput").value;
+    const cityElement = document.getElementById("cityInput");
+    const countryElement = document.getElementById("countryInput");
+    const inputValidity = {city: false, country: false}
 
-    // Evaluate both inputs i.e. are they within character constraints
-    if ( (regex.test(inCity)) && (regex.test(inCountry)) ){
+    // Match input against character limit and update UI if so
+    if (regex.test(cityElement.value)) inputValidity.city = true;
+    if (regex.test(countryElement.value)) inputValidity.country = true; 
+    invalidInput(inputValidity, cityElement, countryElement); 
+
+    // Test if BOTH inputs are valid within character constraints, else do not query api
+    if  ( (inputValidity.city === true) && (inputValidity.country === true)) {
         return true;
     }
     else {
-        invalidInput();
         return false;
     }
 }
-function invalidInput() {
-    document.getElementById("")
+function invalidInput(inputValidity, cityElement, countryElement) {
+    
+    for (property in inputValidity) {
+
+        if (inputValidity[property] === false) {
+            switch (property) {
+                case "city" :
+                    cityElement.value = "City limit of 1-20 letters";
+                    cityElement.style.fontSize = "1.5rem";
+                    cityElement.classList = "error";
+                    break;
+                case "country" :
+                    countryElement.value = "Country limit of 1-20 letters"; 
+                    countryElement.style.fontSize = "1.5rem";
+                    countryElement.classList = "error";
+                    break;
+
+                default: break;
+            }
+        } 
+    }
+
+    // Clear error styling and error text from appropriate elements asynchronously 
+    cityElement.addEventListener("focus", clearError);
+    countryElement.addEventListener("focus", clearError); 
+
+    function clearError(){
+        this.classList.remove("error");
+        this.classList.add("standard");
+        this.value = "";
+        console.log(this);
+    }
 }
