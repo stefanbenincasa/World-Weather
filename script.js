@@ -1,121 +1,113 @@
-// PROGRAM
+// PROGRAM //
 
 
 // MAIN FUNCTIONALITY
+main();
+
 // If there is storage data indicating that weather data has already been input from previous session, use that Object to call 
 
-// Add "valid data" boolean, so that the user can not just hit refresh and go to the next page
-if ( storageEmpty() ){
+function main() {
 
-    // Update UI to prompt new location data
-    newLocationDisplay();
+    if ( storageEmpty() ){
 
-    // Listen to input fields
-    document.getElementById("submit").addEventListener("click", async function newLocation(e) {
-
-        // Prevent default form submission
-        e.preventDefault();
-        // Add form validation here
-        if ( !formValidation() ) {
-            return;
-        } 
-        else {
-
-            // Grab data from input fields
-            const inCity = document.getElementById("cityInput").value;
-            const inCountry = document.getElementById("countryInput").value;
+        // Update UI to prompt new location data
+        newLocationDisplay();
     
-            // Match input country with country code API
-            const countryCode = await countryCodesApi(inCountry);
+        // Listen to input fields
+        document.getElementById("submit").addEventListener("click", async function newLocation(e) {
     
-            // Query API for weather relative to location
-            const weather = await weatherApi(inCity, countryCode);
-            console.log(weather);
+            // Prevent default form submission
+            e.preventDefault();
     
-            // Make Location object 
-            const location = {
-                city: inCity,
-                country: inCountry,
-                forecast: []
+            // Add form validation here
+            if ( !formValidation() ) {
+                return;
+            } 
+            else {
+    
+                // Grab data from input fields
+                const inCity = document.getElementById("cityInput").value;
+                const inCountry = document.getElementById("countryInput").value;
+        
+                // Match input country with country code API
+                const countryCode = await countryCodesApi(inCountry);
+        
+                // Query API for weather relative to location
+                const weather = await weatherApi(inCity, countryCode);
+                console.log(weather);
+    
+                // No city found event must be displayed in UI
+                if (weather.message === "city not found") {
+                    noCityFoundDisplay(); 
+                    setTimeout(main, 3000);
+                }
+                else {
+                    
+                    // Make Location object 
+                    const location = {
+                        city: inCity,
+                        country: inCountry,
+                        forecast: []
+                    }
+            
+                    // Run function that extracts both the date and temperature from "12pm" indexes of each day
+                    const list = weather.list 
+                    let i = 2; 
+                    while (i < list.length) {
+            
+                        // Convert each of these dates to a real day
+                        let dayOfWeekNum = unixTimestamp(list[i].dt);
+                        let weekNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                        
+                        // Extract temperature and day
+                        location.forecast.push( {
+                            overallWeather: list[i].weather[0].main,
+                            day: weekNames[dayOfWeekNum],
+                            temperature: Math.trunc(list[i].main.temp)
+                        });
+            
+                        // Increment index by 8 => days broken into three hour time blocks = 24hrs/3 = 8 ; 12pm selected for each of the five days
+                        i += 8;
+                    }
+            
+                    // Log location
+                    console.log(location);
+            
+                    // Store in sessionStorage
+                    sessionStorage.setItem("City", location.city);
+                    sessionStorage.setItem("Country", location.country);
+                    sessionStorage.setItem("Forecast", JSON.stringify(location.forecast));
+            
+                    // On response, present new page with relevant information
+                    locationDisplay(location);
+                }
             }
-    
-            // Run function that extracts both the date and temperature from "12pm" indexes of each day
-    
-            const list = weather.list 
-            let i = 2; 
-            while (i < list.length) {
-    
-                // Convert each of these dates to a real day
-                let dayOfWeekNum = unixTimestamp(list[i].dt);
-                let weekNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                
-                // Extract temperature and day
-                location.forecast.push( {
-                    overallWeather: list[i].weather[0].main,
-                    day: weekNames[dayOfWeekNum],
-                    temperature: Math.trunc(list[i].main.temp)
-                });
-    
-                // Increment index by 8 => days broken into three hour time blocks = 24/3 = 8 ; 12pm selected fro each of the five days
-                i += 8;
-            }
-    
-            // Log location
-            console.log(location);
-    
-            // Store in sessionStorage
-            sessionStorage.setItem("City", location.city);
-            sessionStorage.setItem("Country", location.country);
-            sessionStorage.setItem("Forecast", JSON.stringify(location.forecast));
-    
-            // On response, present new page with relevant information
-            locationDisplay(location);
+        });
+    } 
+    else {
+        
+        // Update UI with previous stored API data relative to the location stored in sessionStorage
+        
+        // Parse json from storage => sessionStorage has something in it
+        const city = sessionStorage.getItem("City");
+        const country = sessionStorage.getItem("Country");    
+        const forecastString = sessionStorage.getItem("Forecast");
+        const parsedForecast = JSON.parse(forecastString);
+        
+        const location = {
+            city: city,
+            country: country,
+            forecast: parsedForecast
         }
-    });
-} 
-else {
-    
-    // Update UI with previous stored API data relative to the location stored in sessionStorage
-    
-    // Parse json from storage => sessionStorage has something in it
-    const city = sessionStorage.getItem("City");
-    const country = sessionStorage.getItem("Country");    
-    const forecastString = sessionStorage.getItem("Forecast");
-    const parsedForecast = JSON.parse(forecastString);
-    
-    const location = {
-        city: city,
-        country: country,
-        forecast: parsedForecast
-    }
-    console.log(location);
-    
-    // Update locationDisplay UI 
-    locationDisplay(location);
-}   
+        console.log(location);
+        
+        // Update locationDisplay UI 
+        locationDisplay(location);
+    }   
+}
 
 // FUNCTIONS //
 // UI
-function newLocationDisplay() {
-
-    const container = document.getElementById("container"); 
-
-    // Dynamic change of container Display
-    container.style.display = "flex";
-    container.style.justifyContent = "center";
-    container.style.alignItems = "center";
-
-    // Plant HTML
-    container.innerHTML = `
-        <form id="newLocation">
-            <label for="city">City</label>
-            <input type="text" id="cityInput" class="standard" name="city">
-            <label for="country">Country</label>
-            <input type="text" id="countryInput" class="standard" name="country">
-            <input type="submit" id="submit">
-        </form>
-    `;
-}
 function locationDisplay(location) {
 
     // Clear container
@@ -204,6 +196,38 @@ function locationDisplay(location) {
     }
 
 }
+function newLocationDisplay() {
+
+    const container = document.getElementById("container"); 
+
+    // Dynamic change of container Display
+    container.style.display = "flex";
+    container.style.justifyContent = "center";
+    container.style.alignItems = "center";
+
+    // Plant HTML
+    container.innerHTML = `
+        <form id="newLocation">
+            <label for="city">City</label>
+            <input type="text" id="cityInput" class="standard" name="city">
+            <label for="country">Country</label>
+            <input type="text" id="countryInput" class="standard" name="country">
+            <input type="submit" id="submit">
+        </form>
+    `;
+}
+function noCityFoundDisplay() {
+
+    const container = document.getElementById("container"); 
+    
+    // Display "no city found" error 
+    container.innerHTML = `
+        <div id="notFound">
+            <h1>No city of that country found.</h1>
+            <p>Returning home...</p>
+        </div>
+    `;
+}
 
 // STORAGE
 function storageEmpty() {
@@ -257,6 +281,7 @@ function formValidation() {
     if (regex.test(cityElement.value)) inputValidity.city = true;
     if (regex.test(countryElement.value)) inputValidity.country = true; 
     invalidInput(inputValidity, cityElement, countryElement); 
+    console.log(inputValidity);
 
     // Test if BOTH inputs are valid within character constraints, else do not query api
     if  ( (inputValidity.city === true) && (inputValidity.country === true)) {

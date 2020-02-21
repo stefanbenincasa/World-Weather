@@ -27,8 +27,9 @@ body {
 
 h1 {
     font-size: 3rem;
-    text-align: left;
+    text-align: center;
     color: var(--highlight);
+    margin-bottom: 1rem;
 }
 
 label { 
@@ -65,15 +66,22 @@ input {
             background-color: rgba(107,142,35,0.2);
         }
         #submit {
-            background-color: gray;
-            border: none;
             cursor: pointer;
+            border: none;
+            border-radius: 1rem;
+            background-color: gray;
         }
             #submit:hover {
                 background-color: var(--primary-color);
                 color: var(--secondary-color);
                 transition: 0.3s ease;
             }
+    
+    #notFound {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     
     #location {
         width: 100%;
