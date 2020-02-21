@@ -77,7 +77,7 @@ input {
             cursor: pointer;
             border: none;
             border-radius: 1rem;
-            background-color: gray;
+            background-color: black;
         }
             #submit:hover {
                 background-color: var(--primary-color);
