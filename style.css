@@ -125,6 +125,7 @@ input {
             #dayIcons > div {
                 height: 100%;
                 width: 25%;
+                margin-right: .5rem;
                 flex-direction: column;
             }
             #dayIcons i::before {
